@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architecture — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>Architecture</h1>
+          <p class="subtitle">Three-tier platform design with security at every layer.</p>
+
+          <h2>System overview</h2>
+          <div class="diagram">┌─────────────┐     HTTPS      ┌──────────────┐     franz-go     ┌─────────────┐
+│   Browser   │ ─────────────► │  React UI    │                │             │
+│  (no Kafka) │ ◄───────────── │  (nginx)     │                │    Kafka    │
+└─────────────┘                └──────┬───────┘                │   Cluster   │
+                                      │ REST / JWT               │             │
+                                      ▼                          └──────▲──────┘
+                               ┌──────────────┐                       │
+                               │   Go API     │ ──────────────────────┘
+                               │  (chi router)│
+                               └──────┬───────┘
+                                      │ SQL
+                                      ▼
+                               ┌──────────────┐
+                               │  PostgreSQL  │
+                               │  metadata ·  │
+                               │  audit · IAM │
+                               └──────────────┘</div>
+
+          <div class="callout">
+            <strong>Critical security property:</strong> The browser never connects directly to Kafka.
+            All cluster credentials are encrypted at rest and used only by the backend.
+          </div>
+
+          <h2>Components</h2>
+
+          <h3>Frontend (React + TypeScript)</h3>
+          <ul>
+            <li><strong>Vite</strong> build tooling with HMR for development</li>
+            <li><strong>TanStack Query</strong> for server state and caching</li>
+            <li><strong>Tailwind CSS</strong> with dark/light theme support</li>
+            <li><strong>Recharts</strong> for dashboard visualizations</li>
+            <li><strong>React Router</strong> for client-side navigation</li>
+          </ul>
+
+          <h3>Backend (Go)</h3>
+          <ul>
+            <li><strong>chi</strong> HTTP router with middleware (CORS, JWT, request ID)</li>
+            <li><strong>franz-go</strong> (<code>github.com/twmb/franz-go</code>) for Kafka admin, consume, produce</li>
+            <li><strong>PostgreSQL</strong> via <code>pgx</code> connection pool</li>
+            <li><strong>bcrypt</strong> password hashing, <strong>JWT</strong> session tokens</li>
+            <li><strong>AES-GCM</strong> encryption for cluster SASL passwords</li>
+            <li><strong>Prometheus</strong> metrics at <code>/metrics</code></li>
+          </ul>
+
+          <h3>PostgreSQL</h3>
+          <p>Stores all platform metadata:</p>
+          <ul>
+            <li>Users, roles, permissions (database-backed RBAC)</li>
+            <li>Cluster connection configs (encrypted secrets)</li>
+            <li>Audit log entries for sensitive operations</li>
+            <li>Session invalidation via <code>token_version</code></li>
+          </ul>
+
+          <h2>Request flow</h2>
+          <ol>
+            <li>User authenticates via <code>POST /api/v1/auth/login</code> → receives JWT</li>
+            <li>Frontend attaches <code>Authorization: Bearer &lt;token&gt;</code> on every API call</li>
+            <li>Backend middleware validates JWT and loads user permissions from PostgreSQL</li>
+            <li>Route handler checks required permission before executing</li>
+            <li>Kafka operations resolve cluster config, decrypt credentials, open franz-go client</li>
+            <li>Mutations (publish, create topic, etc.) are recorded in the audit log</li>
+          </ol>
+
+          <h2>Multi-cluster model</h2>
+          <p>
+            Each cluster record stores bootstrap servers, optional SASL/TLS configuration, and
+            environment label. The backend resolves connections per request — credentials are
+            never sent to the browser or logged in plaintext.
+          </p>
+
+          <h2>Data flow — RBAC</h2>
+          <div class="diagram">PostgreSQL (roles, permissions, role_permissions)
+        ↓
+   Go store / API (GetRolePermissions)
+        ↓
+   JWT login + /me endpoint
+        ↓
+   React UI (Roles editor, user dropdowns, route guards)</div>
+        </article>
+        <footer class="page-footer">
+          <a href="/installation.html">← Installation</a>
+          <a href="/features.html">Features →</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('architecture', 'Architecture');</script>
+</body>
+</html>

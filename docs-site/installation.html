@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>Installation</h1>
+          <p class="subtitle">Docker Compose deployment and environment configuration.</p>
+
+          <h2>Docker Compose (recommended)</h2>
+          <p>The fastest path to a running instance:</p>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>cd streamforge
+docker compose up -d --build</code></pre>
+          </div>
+
+          <h2>Services</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Container</th><th>Image</th><th>Health check</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>streamforge-db</code></td><td>postgres:16-alpine</td><td><code>pg_isready</code></td></tr>
+                <tr><td><code>backend</code></td><td>Built from <code>./backend</code></td><td><code>GET /health</code></td></tr>
+                <tr><td><code>frontend</code></td><td>Built from <code>./frontend</code></td><td>Depends on backend</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Environment variables</h2>
+          <p>Backend configuration (set in <code>docker-compose.yml</code> or override file):</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>HTTP_PORT</code></td><td><code>8090</code></td><td>API listen port</td></tr>
+                <tr><td><code>DATABASE_URL</code></td><td>postgres://…</td><td>PostgreSQL connection string</td></tr>
+                <tr><td><code>JWT_SECRET</code></td><td>dev secret</td><td>JWT signing key — change in production</td></tr>
+                <tr><td><code>ENCRYPTION_KEY</code></td><td>32-byte hex</td><td>AES-GCM key for cluster credentials</td></tr>
+                <tr><td><code>CORS_ORIGINS</code></td><td><code>http://localhost:3100</code></td><td>Allowed frontend origins</td></tr>
+                <tr><td><code>DEFAULT_ADMIN_USER</code></td><td><code>admin</code></td><td>Bootstrap admin username</td></tr>
+                <tr><td><code>DEFAULT_ADMIN_PASS</code></td><td><code>admin</code></td><td>Bootstrap admin password</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Networks</h2>
+          <p>Docker Compose defines two networks:</p>
+          <ul>
+            <li><code>streamforge-net</code> — internal bridge for UI, API, and database</li>
+            <li><code>banking-net</code> — external network (<code>banking-service_banking-net</code>) for Kafka access</li>
+          </ul>
+          <div class="callout">
+            The database service is named <code>streamforge-db</code> (not <code>postgres</code>) to avoid
+            DNS conflicts when sharing networks with banking-service.
+          </div>
+
+          <h2>Verify installation</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code># API health
+curl http://localhost:8090/health
+
+# Login
+curl -X POST http://localhost:8090/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin","password":"admin"}'</code></pre>
+          </div>
+
+          <h2>Stop and reset</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>docker compose down          # stop containers
+docker compose down -v       # stop and remove volumes (resets DB)</code></pre>
+          </div>
+        </article>
+        <footer class="page-footer">
+          <a href="/getting-started.html">← Getting Started</a>
+          <a href="/architecture.html">Architecture →</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('installation', 'Installation');</script>
+</body>
+</html>

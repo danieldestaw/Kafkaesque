@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RBAC & IAM — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>RBAC &amp; IAM</h1>
+          <p class="subtitle">Database-backed roles, permissions, and user lifecycle management.</p>
+
+          <h2>Overview</h2>
+          <p>
+            Kafkaesque uses role-based access control enforced on every API route. Roles and
+            permissions are stored in PostgreSQL — not hardcoded in the frontend — so administrators
+            can create custom roles and adjust permission matrices through the UI.
+          </p>
+
+          <h2>Default roles</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Role</th><th>Description</th><th>System role</th></tr></thead>
+              <tbody>
+                <tr><td><code>ADMIN</code></td><td>Full platform access including users and roles</td><td>Yes</td></tr>
+                <tr><td><code>OPERATOR</code></td><td>Manage Kafka infrastructure; no user/role admin</td><td>Yes</td></tr>
+                <tr><td><code>DEVELOPER</code></td><td>Inspect clusters, browse/publish messages, create topics</td><td>Yes</td></tr>
+                <tr><td><code>VIEWER</code></td><td>Read-only access to Kafka resources and audit</td><td>Yes</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>System roles can be renamed and have permissions edited, but cannot be deleted.</p>
+
+          <h2>Permission categories</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Category</th><th>Permissions</th></tr></thead>
+              <tbody>
+                <tr><td>Cluster</td><td><code>cluster.read</code>, <code>cluster.manage</code></td></tr>
+                <tr><td>Topics</td><td><code>topic.read</code>, <code>topic.create</code>, <code>topic.update</code>, <code>topic.delete</code></td></tr>
+                <tr><td>Messages</td><td><code>message.read</code>, <code>message.publish</code></td></tr>
+                <tr><td>Consumers</td><td><code>consumer.read</code>, <code>consumer.manage</code></td></tr>
+                <tr><td>Audit</td><td><code>audit.read</code></td></tr>
+                <tr><td>Users</td><td><code>users.read</code>, <code>users.create</code>, <code>users.update</code>, <code>users.delete</code>, <code>users.disable</code>, <code>users.reset_password</code></td></tr>
+                <tr><td>Roles</td><td><code>roles.read</code>, <code>roles.create</code>, <code>roles.update</code>, <code>roles.delete</code>, <code>roles.assign</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>User management</h2>
+          <p>Administrators can manage users from <strong>Administration → Users</strong>:</p>
+          <ul>
+            <li>Create users with email, display name, role, and password</li>
+            <li>Edit user profile, role, and active status</li>
+            <li>Disable / enable accounts</li>
+            <li>Reset passwords (admin-initiated)</li>
+            <li>Revoke all active sessions (increments <code>token_version</code>)</li>
+            <li>View per-user audit history</li>
+          </ul>
+
+          <h2>Session security</h2>
+          <ul>
+            <li>JWT tokens include <code>token_version</code> claim</li>
+            <li>Revoking sessions increments the user's version — old tokens are rejected</li>
+            <li>Password changes can invalidate existing sessions</li>
+            <li>Login attempts (success and failure) are audit-logged</li>
+          </ul>
+
+          <h2>Role editor</h2>
+          <p>
+            From <strong>Administration → Roles</strong>, admins can create custom roles with a
+            permission matrix loaded from <code>GET /api/v1/permissions</code>. Changes persist
+            immediately to PostgreSQL and apply on the next API request.
+          </p>
+
+          <h2>Frontend enforcement</h2>
+          <ul>
+            <li><code>AdminRoute</code> — guards admin pages by permission</li>
+            <li><code>PermissionGuard</code> — conditionally renders UI elements</li>
+            <li>Navigation items filtered by user's effective permissions</li>
+          </ul>
+        </article>
+        <footer class="page-footer">
+          <a href="/dashboard.html">← Dashboard</a>
+          <a href="/banking-integration.html">Banking Service →</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('rbac', 'RBAC & IAM');</script>
+</body>
+</html>

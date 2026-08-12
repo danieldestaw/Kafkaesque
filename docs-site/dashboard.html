@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>Dashboard</h1>
+          <p class="subtitle">Real-time overview of your Kafka ecosystem.</p>
+
+          <p>
+            The dashboard is the default landing page after login. It requires an active cluster
+            selection and pulls live data from the cluster health, topics, consumer groups, and
+            audit APIs — refreshing every 30 seconds automatically.
+          </p>
+
+          <h2>Layout</h2>
+
+          <h3>Row 1 — KPI cards</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Card</th><th>Source</th><th>Details</th></tr></thead>
+              <tbody>
+                <tr><td>Brokers</td><td>Cluster health</td><td>Online broker count with sparkline</td></tr>
+                <tr><td>Topics</td><td>Cluster health + topics API</td><td>Active (non-internal) topic count</td></tr>
+                <tr><td>Partitions</td><td>Cluster health</td><td>Total partition count</td></tr>
+                <tr><td>Consumer Groups</td><td>Cluster health</td><td>Active group count</td></tr>
+                <tr><td>Under-Replicated</td><td>Cluster health</td><td>Partitions needing attention</td></tr>
+                <tr><td>Offline Partitions</td><td>Cluster health</td><td>Critical partition count</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Row 2 — Metrics &amp; health</h3>
+          <ul>
+            <li><strong>Cluster Metrics</strong> — Multi-series area chart tracking brokers, topics, partitions, and consumer groups over the last 30 minutes. History builds from live health polls.</li>
+            <li><strong>Cluster Health</strong> — Donut gauge with shield icon, status label (<code>HEALTHY</code> / degraded), and checklist: brokers online, partitions healthy, replication %, disk usage. Link to brokers page.</li>
+          </ul>
+
+          <h3>Row 3 — Insights</h3>
+          <ul>
+            <li><strong>Top Topics by Messages</strong> — Donut chart ranked by partition count with percentage legend. Link to topics page.</li>
+            <li><strong>Recent Activity</strong> — Last five audit log entries with timestamps and SUCCESS/INFO badges. Link to audit page.</li>
+            <li><strong>Cluster Load</strong> — Three progress bars:
+              <ul>
+                <li><em>Partition density</em> — partitions per broker (e.g. 83% · 83 partitions / broker)</li>
+                <li><em>Consumer lag</em> — derived from total lag across groups</li>
+                <li><em>Replication stress</em> — under-replication indicator</li>
+              </ul>
+              Link to consumer groups page.
+            </li>
+          </ul>
+
+          <h2>Refresh control</h2>
+          <p>
+            The header shows <strong>Last updated: just now</strong> with a refresh button.
+            Clicking it invalidates all dashboard queries and reloads data immediately.
+          </p>
+
+          <h2>Sidebar widgets</h2>
+          <ul>
+            <li><strong>Cluster Status</strong> — Green indicator when cluster health is <code>HEALTHY</code></li>
+            <li><strong>User profile</strong> — Avatar, display name, and role at the bottom of the sidebar</li>
+          </ul>
+
+          <div class="callout">
+            All dashboard metrics come from live API responses. No mock or placeholder data is shown
+            when a cluster is connected.
+          </div>
+        </article>
+        <footer class="page-footer">
+          <a href="/features.html">← Features</a>
+          <a href="/rbac.html">RBAC & IAM →</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('dashboard', 'Dashboard');</script>
+</body>
+</html>

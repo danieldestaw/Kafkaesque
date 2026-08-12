@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roadmap — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>Roadmap</h1>
+          <p class="subtitle">Planned features and release milestones.</p>
+
+          <h2>v0.1 — Current</h2>
+          <ul>
+            <li>Authentication and JWT sessions</li>
+            <li>Database-backed RBAC with user and role management</li>
+            <li>Multi-cluster management with encrypted credentials</li>
+            <li>Topics, messages, consumer groups, brokers</li>
+            <li>Live dashboard with health metrics and cluster load</li>
+            <li>Audit logging and notification feed</li>
+            <li>Command palette (<kbd>⌘K</kbd>)</li>
+            <li>Dark/light mode</li>
+            <li>Docker Compose deployment</li>
+            <li>banking-service Kafka integration</li>
+          </ul>
+
+          <h2>v0.2</h2>
+          <ul>
+            <li>Schema Registry integration</li>
+            <li>Kafka Connect management</li>
+            <li>WebSocket live message tail</li>
+            <li>Enhanced command palette actions</li>
+          </ul>
+
+          <h2>v0.3</h2>
+          <ul>
+            <li>ACL management</li>
+            <li>Alert rules and notifications</li>
+            <li>Prometheus dashboards</li>
+          </ul>
+
+          <h2>v0.4</h2>
+          <ul>
+            <li>Helm chart and Kubernetes manifests</li>
+            <li>Plugin architecture</li>
+            <li>OIDC / SSO authentication</li>
+          </ul>
+
+          <div class="callout">
+            Roadmap items are subject to change. Contributions and feature requests are welcome
+            on the project repository.
+          </div>
+
+          <h2>License</h2>
+          <p>
+            Kafkaesque (StreamForge) is licensed under the <strong>Apache License 2.0</strong>.
+            See the <code>LICENSE</code> file in the repository root.
+          </p>
+        </article>
+        <footer class="page-footer">
+          <a href="/development.html">← Development</a>
+          <a href="/index.html">Back to Overview</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('roadmap', 'Roadmap');</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Development — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>Development</h1>
+          <p class="subtitle">Run backend and frontend locally outside Docker.</p>
+
+          <h2>Prerequisites</h2>
+          <ul>
+            <li><strong>Go 1.23+</strong> for the backend</li>
+            <li><strong>Node.js 20+</strong> and npm for the frontend</li>
+            <li><strong>PostgreSQL 16</strong> (or use Docker for DB only)</li>
+          </ul>
+
+          <h2>Database only via Docker</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>docker compose up -d streamforge-db</code></pre>
+          </div>
+
+          <h2>Backend</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>cd backend
+
+export DATABASE_URL="postgres://streamforge:streamforge@localhost:5433/streamforge?sslmode=disable"
+export JWT_SECRET="dev-streamforge-secret"
+export ENCRYPTION_KEY="0123456789abcdef0123456789abcdef"
+export HTTP_PORT=8090
+export CORS_ORIGINS="http://localhost:5173"
+
+go run ./cmd/streamforge</code></pre>
+          </div>
+          <p>Migrations run automatically on startup.</p>
+
+          <h2>Frontend</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>cd frontend
+npm install
+npm run dev</code></pre>
+          </div>
+          <p>Vite dev server runs at <code>http://localhost:5173</code> with API proxy to the backend.</p>
+
+          <h2>Running tests</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>cd backend
+go test ./...</code></pre>
+          </div>
+
+          <h2>Project structure</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>streamforge/
+├── backend/
+│   ├── cmd/streamforge/     # Entry point
+│   └── internal/
+│       ├── api/             # HTTP handlers & router
+│       ├── auth/            # JWT & login
+│       ├── authorization/   # RBAC helpers
+│       ├── kafkaclient/     # franz-go wrapper
+│       ├── storage/         # PostgreSQL store & migrations
+│       └── crypto/          # AES-GCM encryption
+├── frontend/
+│   └── src/
+│       ├── pages/           # Route pages
+│       ├── components/      # UI components
+│       ├── api/             # API client
+│       └── stores/          # Auth state
+├── docs-site/               # This documentation (static)
+└── docker-compose.yml</code></pre>
+          </div>
+
+          <h2>Tech stack</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Layer</th><th>Technologies</th></tr></thead>
+              <tbody>
+                <tr><td>Frontend</td><td>React 18, TypeScript, Vite, TanStack Query, Tailwind, Recharts, Lucide</td></tr>
+                <tr><td>Backend</td><td>Go, chi, franz-go, pgx, JWT, bcrypt, Prometheus</td></tr>
+                <tr><td>Database</td><td>PostgreSQL 16</td></tr>
+                <tr><td>Infra</td><td>Docker Compose, nginx</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <footer class="page-footer">
+          <a href="/deployment.html">← Deployment</a>
+          <a href="/roadmap.html">Roadmap →</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('development', 'Development');</script>
+</body>
+</html>

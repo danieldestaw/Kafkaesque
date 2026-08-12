@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Features — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>Features</h1>
+          <p class="subtitle">Everything included in Kafkaesque v0.1.</p>
+
+          <input type="search" class="search-box" placeholder="Filter features…" data-docs-search aria-label="Search features" />
+
+          <div data-search-item>
+            <h2>Cluster management</h2>
+            <ul>
+              <li>Register multiple Kafka clusters with encrypted credentials</li>
+              <li>Test connection before saving</li>
+              <li>Environment labels: Development, Staging, Production</li>
+              <li>Cluster selector in the header with live connection status</li>
+              <li>Shared Docker network support for co-located services</li>
+            </ul>
+          </div>
+
+          <div data-search-item>
+            <h2>Brokers &amp; topics</h2>
+            <ul>
+              <li>List brokers with leader partition counts and rack info</li>
+              <li>List, create, and delete topics</li>
+              <li>Partition inspection with leader/replica details</li>
+              <li>Internal topics filtered from user-facing views</li>
+            </ul>
+          </div>
+
+          <div data-search-item>
+            <h2>Messages</h2>
+            <ul>
+              <li>Browse messages by partition with offset navigation</li>
+              <li>Produce messages with key, value, and headers</li>
+              <li>Values rendered as plain text (never HTML — XSS safe)</li>
+              <li>All publish operations audited</li>
+            </ul>
+          </div>
+
+          <div data-search-item>
+            <h2>Consumer groups</h2>
+            <ul>
+              <li>List groups with state, members, topic count</li>
+              <li>Total lag and max lag per group</li>
+              <li>Detail drawer with lag warnings</li>
+              <li>Offset reset (permission-gated)</li>
+            </ul>
+          </div>
+
+          <div data-search-item>
+            <h2>Dashboard</h2>
+            <ul>
+              <li>Six KPI cards: Brokers, Topics, Partitions, Consumer Groups, Under-Replicated, Offline Partitions</li>
+              <li>Cluster Metrics area chart (30-minute history)</li>
+              <li>Cluster Health donut with operational checklist</li>
+              <li>Top Topics by Messages donut chart</li>
+              <li>Recent Activity from audit log</li>
+              <li>Cluster Load: partition density, consumer lag, replication stress</li>
+              <li>Live refresh with last-updated timestamp</li>
+            </ul>
+          </div>
+
+          <div data-search-item>
+            <h2>Identity &amp; access</h2>
+            <ul>
+              <li>User CRUD with enable/disable and soft delete</li>
+              <li>Password reset (admin) and self-service password change</li>
+              <li>Session revocation via token version increment</li>
+              <li>Database-backed roles and permissions (editable in UI)</li>
+              <li>Default roles: Admin, Operator, Developer, Viewer</li>
+              <li>Per-user audit history</li>
+            </ul>
+          </div>
+
+          <div data-search-item>
+            <h2>Audit &amp; observability</h2>
+            <ul>
+              <li>Full audit log for login, topic, message, and admin operations</li>
+              <li>Notification bell with unread activity count</li>
+              <li>Global search command palette (<kbd>⌘K</kbd>)</li>
+              <li>Prometheus metrics endpoint on backend</li>
+            </ul>
+          </div>
+
+          <div data-search-item>
+            <h2>UI/UX</h2>
+            <ul>
+              <li>Dark and light mode with persisted preference</li>
+              <li>Responsive layout with collapsible sidebar</li>
+              <li>Modern login page with theme toggle</li>
+              <li>Toast notifications and confirmation dialogs</li>
+            </ul>
+          </div>
+        </article>
+        <footer class="page-footer">
+          <a href="/architecture.html">← Architecture</a>
+          <a href="/dashboard.html">Dashboard →</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('features', 'Features');</script>
+</body>
+</html>

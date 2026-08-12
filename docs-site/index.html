@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Kafkaesque — open-source Kafka management and observability platform documentation." />
+  <title>Overview — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <section class="hero">
+          <span class="hero-badge">v0.1 · Apache 2.0</span>
+          <h1>Kafka management,<br />done properly</h1>
+          <p class="lead">
+            <strong>Kafkaesque</strong> (StreamForge) is an open-source platform for managing,
+            monitoring, and operating Apache Kafka clusters — with RBAC, audit logging, and a
+            modern dashboard.
+          </p>
+          <div class="hero-actions">
+            <a href="/getting-started.html" class="btn btn-primary">Get Started →</a>
+            <a href="/architecture.html" class="btn btn-secondary">Architecture</a>
+          </div>
+        </section>
+
+        <div class="card-grid">
+          <article class="card">
+            <a href="/getting-started.html" class="stretched">
+              <h3>🚀 Quick Start</h3>
+              <p>Run with Docker Compose and sign in with the default admin account in under five minutes.</p>
+            </a>
+          </article>
+          <article class="card">
+            <a href="/architecture.html" class="stretched">
+              <h3>🏗 Architecture</h3>
+              <p>Three-tier design: React UI, Go API, PostgreSQL metadata — the browser never talks to Kafka directly.</p>
+            </a>
+          </article>
+          <article class="card">
+            <a href="/rbac.html" class="stretched">
+              <h3>🔐 RBAC & IAM</h3>
+              <p>Database-backed roles and permissions with Admin, Operator, Developer, and Viewer defaults.</p>
+            </a>
+          </article>
+          <article class="card">
+            <a href="/dashboard.html" class="stretched">
+              <h3>📊 Dashboard</h3>
+              <p>Real-time KPIs, cluster health, topic distribution, activity feed, and cluster load metrics.</p>
+            </a>
+          </article>
+          <article class="card">
+            <a href="/banking-integration.html" class="stretched">
+              <h3>🏦 Banking Service</h3>
+              <p>Connect to the banking-service Kafka cluster over a shared Docker network.</p>
+            </a>
+          </article>
+          <article class="card">
+            <a href="/api-reference.html" class="stretched">
+              <h3>📡 API Reference</h3>
+              <p>REST API for clusters, topics, messages, consumer groups, users, roles, and audit logs.</p>
+            </a>
+          </article>
+        </div>
+
+        <h2>What is Kafkaesque?</h2>
+        <p>
+          Kafkaesque provides a unified control plane for Apache Kafka. Operators and developers
+          can manage multiple clusters, inspect brokers and partitions, browse and produce messages,
+          monitor consumer lag, and review audit trails — all through a secure web interface.
+        </p>
+        <p>
+          The backend is written in <strong>Go</strong> using <code>franz-go</code> for native Kafka
+          connectivity. The frontend is a <strong>React + TypeScript</strong> SPA with TanStack Query,
+          Tailwind CSS, and dark/light mode support.
+        </p>
+
+        <div class="flow">
+          <div class="flow-box">Browser</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box accent">React UI</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box accent">Go API</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">Kafka Cluster</div>
+        </div>
+
+        <h2>Key capabilities</h2>
+        <ul>
+          <li>Multi-cluster management with encrypted credentials (server-side only)</li>
+          <li>Topics: list, create, delete, partition inspection</li>
+          <li>Message browser and producer with audit logging</li>
+          <li>Consumer groups and lag monitoring</li>
+          <li>Live dashboard with cluster health metrics</li>
+          <li>User management, session revocation, password reset</li>
+          <li>Editable roles and permissions stored in PostgreSQL</li>
+          <li>Command palette (<kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>)</li>
+        </ul>
+
+        <footer class="page-footer">
+          <span>Licensed under Apache License 2.0</span>
+          <span>StreamForge / Kafkaesque v0.1</span>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('overview', 'Overview');</script>
+</body>
+</html>

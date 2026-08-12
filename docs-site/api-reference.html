@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>API Reference</h1>
+          <p class="subtitle">REST API at <code>http://localhost:8090</code> (default).</p>
+
+          <h2>Authentication</h2>
+          <p>All endpoints under <code>/api/v1/*</code> (except login) require a JWT bearer token.</p>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>POST /api/v1/auth/login
+Content-Type: application/json
+
+{"email":"admin","password":"admin"}
+
+→ { "token": "...", "user": { ... } }</code></pre>
+          </div>
+          <p>Include the token in subsequent requests:</p>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>Authorization: Bearer &lt;token&gt;</code></pre>
+          </div>
+
+          <h2>Health &amp; metrics</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>GET</td><td><code>/health</code></td><td>No</td><td>Service health check</td></tr>
+                <tr><td>GET</td><td><code>/metrics</code></td><td>No</td><td>Prometheus metrics</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Auth &amp; profile</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>POST</td><td><code>/api/v1/auth/login</code></td><td>Authenticate and receive JWT</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/me</code></td><td>Current user profile and permissions</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/me/password</code></td><td>Change own password</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Users</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>GET</td><td><code>/api/v1/users</code></td><td>List users</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/users</code></td><td>Create user</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/users/{userID}</code></td><td>Get user</td></tr>
+                <tr><td>PUT</td><td><code>/api/v1/users/{userID}</code></td><td>Update user</td></tr>
+                <tr><td>DELETE</td><td><code>/api/v1/users/{userID}</code></td><td>Delete user</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/users/{userID}/disable</code></td><td>Disable account</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/users/{userID}/enable</code></td><td>Enable account</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/users/{userID}/reset-password</code></td><td>Admin password reset</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/users/{userID}/revoke-sessions</code></td><td>Invalidate all sessions</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/users/{userID}/audit</code></td><td>User audit history</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Roles &amp; permissions</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>GET</td><td><code>/api/v1/permissions</code></td><td>List permissions (grouped)</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/roles</code></td><td>List roles</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/roles</code></td><td>Create role</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/roles/{roleID}</code></td><td>Get role with permissions</td></tr>
+                <tr><td>PUT</td><td><code>/api/v1/roles/{roleID}</code></td><td>Update role</td></tr>
+                <tr><td>DELETE</td><td><code>/api/v1/roles/{roleID}</code></td><td>Delete role (non-system)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Clusters</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>GET</td><td><code>/api/v1/clusters</code></td><td>List clusters</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/clusters</code></td><td>Register cluster</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/clusters/test-connection</code></td><td>Test connection (preview)</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/clusters/{id}</code></td><td>Get cluster</td></tr>
+                <tr><td>DELETE</td><td><code>/api/v1/clusters/{id}</code></td><td>Delete cluster</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/clusters/{id}/test</code></td><td>Test saved cluster</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/clusters/{id}/health</code></td><td>Cluster health metrics</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/clusters/{id}/brokers</code></td><td>List brokers</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/clusters/{id}/topics</code></td><td>List topics</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/clusters/{id}/topics</code></td><td>Create topic</td></tr>
+                <tr><td>DELETE</td><td><code>/api/v1/clusters/{id}/topics/{topic}</code></td><td>Delete topic</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/clusters/{id}/topics/{topic}/partitions</code></td><td>List partitions</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/clusters/{id}/topics/{topic}/messages</code></td><td>Fetch messages</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/clusters/{id}/topics/{topic}/messages</code></td><td>Publish message</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/clusters/{id}/consumer-groups</code></td><td>List consumer groups</td></tr>
+                <tr><td>POST</td><td><code>/api/v1/clusters/{id}/consumer-groups/{groupID}/reset-offsets</code></td><td>Reset offsets</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Audit &amp; search</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>GET</td><td><code>/api/v1/audit</code></td><td>List audit log entries</td></tr>
+                <tr><td>GET</td><td><code>/api/v1/search</code></td><td>Global search (topics, groups, etc.)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Error format</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>{
+  "error": {
+    "code": "INVALID_CREDENTIALS",
+    "message": "Invalid email or password"
+  }
+}</code></pre>
+          </div>
+        </article>
+        <footer class="page-footer">
+          <a href="/banking-integration.html">← Banking Service</a>
+          <a href="/deployment.html">Deployment →</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('api', 'API Reference');</script>
+</body>
+</html>

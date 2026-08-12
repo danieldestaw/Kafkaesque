@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deployment — Kafkaesque Docs</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="docs-layout">
+    <aside id="sidebar" class="sidebar"></aside>
+    <div class="main-panel">
+      <div id="topbar"></div>
+      <main class="content">
+        <article>
+          <h1>Deployment</h1>
+          <p class="subtitle">Production considerations and deployment options.</p>
+
+          <h2>Docker Compose (development / staging)</h2>
+          <p>The included <code>docker-compose.yml</code> is suitable for local development and small staging environments:</p>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>docker compose up -d --build</code></pre>
+          </div>
+
+          <h2>Production checklist</h2>
+          <ul>
+            <li>Replace <code>JWT_SECRET</code> with a cryptographically random value (≥ 32 bytes)</li>
+            <li>Replace <code>ENCRYPTION_KEY</code> with a unique 32-byte hex key</li>
+            <li>Set strong <code>DEFAULT_ADMIN_USER</code> and <code>DEFAULT_ADMIN_PASS</code> before first boot</li>
+            <li>Use managed PostgreSQL with TLS and backups</li>
+            <li>Configure <code>CORS_ORIGINS</code> to your production domain only</li>
+            <li>Place the API behind a reverse proxy with TLS termination</li>
+            <li>Restrict network access to Kafka brokers (VPN or private network)</li>
+            <li>Enable Prometheus scraping of <code>/metrics</code></li>
+            <li>Review and rotate cluster credentials periodically</li>
+          </ul>
+
+          <h2>Frontend build</h2>
+          <p>The frontend is a static SPA built with Vite and served by nginx in Docker:</p>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>cd frontend
+npm ci
+npm run build
+# Output: frontend/dist/</code></pre>
+          </div>
+          <p>The nginx config proxies API requests to the backend service.</p>
+
+          <h2>Backend build</h2>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>cd backend
+go build -o streamforge ./cmd/streamforge
+./streamforge</code></pre>
+          </div>
+
+          <h2>Deploy documentation to Vercel</h2>
+          <p>This documentation site is a static HTML/CSS/JS site in the <code>docs-site/</code> directory:</p>
+          <div class="code-block">
+            <button type="button" data-copy>Copy</button>
+            <pre><code>cd docs-site
+npx vercel --prod</code></pre>
+          </div>
+          <p>Or connect the repository to Vercel and set the root directory to <code>docs-site</code>.</p>
+
+          <h2>Ports reference</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Port</th><th>Service</th></tr></thead>
+              <tbody>
+                <tr><td>3100</td><td>Frontend UI</td></tr>
+                <tr><td>8090</td><td>Backend API</td></tr>
+                <tr><td>5433</td><td>PostgreSQL (host-mapped)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Future: Kubernetes</h2>
+          <p>
+            Helm charts and Kubernetes manifests are planned for v0.4. See the
+            <a href="/roadmap.html">Roadmap</a> for details.
+          </p>
+        </article>
+        <footer class="page-footer">
+          <a href="/api-reference.html">← API Reference</a>
+          <a href="/development.html">Development →</a>
+        </footer>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>DocsSite.init('deployment', 'Deployment');</script>
+</body>
+</html>
