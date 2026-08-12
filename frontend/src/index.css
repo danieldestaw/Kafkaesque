@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sf-bg: #f4f6f9;
+  --sf-panel: #ffffff;
+  --sf-border: #e2e8f0;
+  --sf-text: #0f172a;
+  --sf-muted: #64748b;
+  --sf-accent: #4f46e5;
+}
+
+.dark {
+  --sf-bg: #0a0a12;
+  --sf-panel: #12121c;
+  --sf-border: #1e1e2e;
+  --sf-text: #f4f4f5;
+  --sf-muted: #94a3b8;
+  --sf-accent: #818cf8;
+}
+
+* {
+  border-color: var(--sf-border);
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--sf-bg);
+  color: var(--sf-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-left {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-fade-in { animation: fade-in 0.15s ease-out; }
+.animate-scale-in { animation: scale-in 0.15s ease-out; }
+.animate-slide-up { animation: slide-up 0.2s ease-out; }
+.animate-slide-left { animation: slide-left 0.2s ease-out; }
+
+.text-sf-muted { color: var(--sf-muted); }
+.text-sf-accent { color: var(--sf-accent); }
+.text-sf-danger { color: #dc2626; }
+.bg-sf-panel { background: var(--sf-panel); }
+.bg-sf-bg { background: var(--sf-bg); }
+.border-sf-border { border-color: var(--sf-border); }
+
+@media (min-width: 1280px) {
+  .dashboard-page {
+    max-height: calc(100vh - 3.5rem - 2rem);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-middle {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .dashboard-middle > * {
+    min-height: 0;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .dashboard-bottom {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  .dashboard-bottom > * {
+    overflow: visible;
+  }
+
+  .dashboard-chart {
+    min-height: 180px;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 1279px) {
+  .dashboard-page {
+    overflow: visible;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-up,
+  .animate-slide-left {
+    animation: none;
+  }
+
+  .login-orb {
+    animation: none;
+  }
+}
+
+@keyframes login-float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 20px) scale(1.08); }
+}
+
+@keyframes login-float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-24px, 30px) scale(1.05); }
+}
+
+@keyframes login-float-c {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, -24px) scale(1.06); }
+}
+
+.login-orb-a { animation: login-float-a 14s ease-in-out infinite; }
+.login-orb-b { animation: login-float-b 18s ease-in-out infinite; }
+.login-orb-c { animation: login-float-c 16s ease-in-out infinite; }
