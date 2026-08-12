@@ -1,0 +1,22 @@
+# Backend
+backend/bin/
+backend/tmp/
+*.exe
+*.test
+*.out
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# General
+.env
+.env.local
+*.log
+.DS_Store
+.idea/
+.vscode/
+coverage/
+*.pem
+*.key
