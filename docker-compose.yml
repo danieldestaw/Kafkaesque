@@ -1,0 +1,65 @@
+services:
+  streamforge-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: streamforge
+      POSTGRES_USER: streamforge
+      POSTGRES_PASSWORD: streamforge
+    ports:
+      - "5433:5432"
+    volumes:
+      - sf_postgres_v2:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U streamforge -d streamforge"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - streamforge-net
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8090:8090"
+    environment:
+      APP_ENV: development
+      HTTP_PORT: "8090"
+      DATABASE_URL: postgres://streamforge:streamforge@streamforge-db:5432/streamforge?sslmode=disable
+      JWT_SECRET: dev-streamforge-secret-change-in-prod
+      ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef"
+      CORS_ORIGINS: http://localhost:3100
+      DEFAULT_ADMIN_USER: admin
+      DEFAULT_ADMIN_PASS: admin
+    depends_on:
+      streamforge-db:
+        condition: service_healthy
+    networks:
+      - streamforge-net
+      - banking-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8090/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3100:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - streamforge-net
+
+networks:
+  streamforge-net:
+    driver: bridge
+  banking-net:
+    external: true
+    name: banking-service_banking-net
+
+volumes:
+  sf_postgres_v2:
