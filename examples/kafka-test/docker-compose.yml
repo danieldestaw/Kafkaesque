@@ -1,0 +1,116 @@
+services:
+  kafka:
+    image: apache/kafka:3.8.0
+    hostname: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - kafkaesque-test
+
+  kafka-init:
+    image: apache/kafka:3.8.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
+          --topic orders --partitions 3 --replication-factor 1
+        echo "Topic orders ready"
+    networks:
+      - kafkaesque-test
+
+  producer:
+    image: apache/kafka:3.8.0
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        seq=0
+        while true; do
+          seq=$$((seq + 1))
+          msg="{\"sequence\":$${seq},\"type\":\"order.created\",\"customer_id\":\"cust-$$((1000 + RANDOM % 9000))\",\"amount_cents\":$$((500 + RANDOM % 24500)),\"timestamp\":\"$$(date -Iseconds)\"}"
+          echo "$$msg" | /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server kafka:9092 --topic orders
+          echo "Produced #$${seq}"
+          sleep 2
+        done
+    networks:
+      - kafkaesque-test
+
+  service-a:
+    image: apache/kafka:3.8.0
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo "service-a starting (group=consumer-group-a)"
+        /opt/kafka/bin/kafka-console-consumer.sh \
+          --bootstrap-server kafka:9092 \
+          --topic orders \
+          --group consumer-group-a \
+          --property print.timestamp=true
+    networks:
+      - kafkaesque-test
+
+  service-b:
+    image: apache/kafka:3.8.0
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo "service-b starting (group=consumer-group-b)"
+        /opt/kafka/bin/kafka-console-consumer.sh \
+          --bootstrap-server kafka:9092 \
+          --topic orders \
+          --group consumer-group-b \
+          --property print.timestamp=true
+    networks:
+      - kafkaesque-test
+
+  service-c:
+    image: apache/kafka:3.8.0
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo "service-c starting (group=consumer-group-c)"
+        /opt/kafka/bin/kafka-console-consumer.sh \
+          --bootstrap-server kafka:9092 \
+          --topic orders \
+          --group consumer-group-c \
+          --property print.timestamp=true
+    networks:
+      - kafkaesque-test
+
+networks:
+  kafkaesque-test:
+    name: kafkaesque-test
+    driver: bridge

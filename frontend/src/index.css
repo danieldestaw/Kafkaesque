@@ -1,0 +1,324 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Slab:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sf-primary: #0057b8;
+  --sf-primary-hover: #004a9e;
+  --sf-primary-light: #e8f1fb;
+  --sf-bg: #eef2f7;
+  --sf-panel: #ffffff;
+  --sf-input: #f5f5f7;
+  --sf-border: #e4e8ef;
+  --sf-text: #1a2332;
+  --sf-muted: #6b7280;
+  --sf-accent: #0057b8;
+  --sf-sidebar: #0057b8;
+  --sf-sidebar-hover: rgba(255, 255, 255, 0.12);
+  --sf-sidebar-active: rgba(255, 255, 255, 0.18);
+  --sf-radius-lg: 20px;
+  --sf-radius-md: 12px;
+  --sf-radius-sm: 8px;
+}
+
+.dark {
+  --sf-primary: #4d9fef;
+  --sf-primary-hover: #6bb0f5;
+  --sf-primary-light: rgba(77, 159, 239, 0.12);
+  --sf-bg: #111827;
+  --sf-panel: #1f2937;
+  --sf-input: #374151;
+  --sf-border: #374151;
+  --sf-text: #f3f4f6;
+  --sf-muted: #9ca3af;
+  --sf-accent: #4d9fef;
+  --sf-sidebar: #0c2d5c;
+  --sf-sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sf-sidebar-active: rgba(255, 255, 255, 0.14);
+}
+
+* {
+  border-color: var(--sf-border);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--sf-bg);
+  color: var(--sf-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  overflow: hidden;
+}
+
+.font-serif,
+.font-heading {
+  font-family: 'Roboto Slab', Georgia, serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-left {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-fade-in { animation: fade-in 0.15s ease-out; }
+.animate-scale-in { animation: scale-in 0.15s ease-out; }
+.animate-slide-up { animation: slide-up 0.2s ease-out; }
+.animate-slide-left { animation: slide-left 0.2s ease-out; }
+
+.text-sf-muted { color: var(--sf-muted); }
+.text-sf-accent { color: var(--sf-accent); }
+.text-sf-danger { color: #dc2626; }
+.bg-sf-panel { background: var(--sf-panel); }
+.bg-sf-bg { background: var(--sf-bg); }
+.bg-sf-input { background: var(--sf-input); }
+.border-sf-border { border-color: var(--sf-border); }
+
+/* Login page — full viewport split, theme-aware */
+.login-page {
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  overflow: auto;
+}
+
+.login-form-panel {
+  background: var(--sf-panel);
+  color: var(--sf-text);
+}
+
+.login-input {
+  background: var(--sf-input);
+  border: 1px solid transparent;
+  border-radius: var(--sf-radius-sm);
+  color: var(--sf-text);
+}
+
+.login-input:focus {
+  outline: 2px solid color-mix(in srgb, var(--sf-primary) 40%, transparent);
+  outline-offset: 0;
+  border-color: color-mix(in srgb, var(--sf-primary) 25%, transparent);
+}
+
+.login-btn-primary {
+  background: var(--sf-primary);
+  border-radius: var(--sf-radius-sm);
+}
+
+.login-btn-primary:hover:not(:disabled) {
+  background: var(--sf-primary-hover);
+}
+
+.login-btn-oauth {
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-sm);
+  background: var(--sf-panel);
+}
+
+.login-btn-oauth:hover {
+  background: var(--sf-input);
+}
+
+/* Sidebar */
+.sidebar-nav-item {
+  border-radius: var(--sf-radius-sm);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-nav-item:hover {
+  background: var(--sf-sidebar-hover);
+}
+
+.sidebar-nav-item.active {
+  background: var(--sf-sidebar-active);
+}
+
+/* White wordmark on blue sidebar (light + dark) */
+.sidebar-brand {
+  min-height: 4.5rem;
+}
+
+.sidebar-logo {
+  display: block;
+  filter: brightness(0) invert(1);
+  opacity: 0.98;
+}
+
+/* App shell — desktop: fixed viewport; smaller screens: allow natural scroll */
+.app-shell {
+  height: 100%;
+  min-height: 100%;
+}
+
+@media (max-width: 1023px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-shell {
+    height: auto;
+    min-height: 100%;
+  }
+}
+
+/* Main content scroll area */
+.app-main {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Dashboard — fill viewport below header on large screens */
+.dashboard-main:has(.dashboard-page) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.dashboard-page {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1.1fr) minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dashboard-header-row,
+.dashboard-metrics-grid {
+  flex-shrink: 0;
+}
+
+.dashboard-middle {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.dashboard-middle > div {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.dashboard-status-bar {
+  flex-shrink: 0;
+}
+
+.dashboard-bottom {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.dashboard-bottom > * {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Tablet: 2-column bottom row */
+@media (min-width: 640px) {
+  .dashboard-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-bottom > :last-child:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Desktop dashboard layout */
+@media (min-width: 1024px) {
+  .dashboard-middle {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .dashboard-bottom {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dashboard-bottom > :last-child:nth-child(3) {
+    grid-column: auto;
+  }
+}
+
+/* Smaller screens: stack dashboard and scroll */
+@media (max-width: 1023px) {
+  .dashboard-main:has(.dashboard-page) {
+    overflow: auto;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .dashboard-page {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    min-height: min-content;
+  }
+
+  .dashboard-middle,
+  .dashboard-bottom {
+    min-height: 240px;
+    height: auto;
+  }
+
+  .dashboard-middle > div,
+  .dashboard-bottom > * {
+    min-height: 220px;
+    height: auto;
+  }
+}
+
+@media (max-width: 639px) {
+  .dashboard-middle,
+  .dashboard-bottom {
+    min-height: 200px;
+  }
+
+  .dashboard-middle > div,
+  .dashboard-bottom > * {
+    min-height: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-up,
+  .animate-slide-left {
+    animation: none;
+  }
+}

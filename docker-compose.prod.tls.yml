@@ -1,0 +1,10 @@
+# Optional TLS overlay — use with docker-compose.prod.yml
+# Place fullchain.pem and privkey.pem in deploy/certs/
+
+services:
+  frontend:
+    ports:
+      - "${KAFKAESQUE_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./frontend/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/certs:/etc/nginx/certs:ro

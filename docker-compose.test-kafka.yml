@@ -1,0 +1,11 @@
+# Optional override: attach Kafkaesque backend to the demo Kafka network.
+# Start the test environment first: cd examples/kafka-test && docker compose up -d
+services:
+  backend:
+    networks:
+      - kafkaesque-test
+
+networks:
+  kafkaesque-test:
+    external: true
+    name: kafkaesque-test

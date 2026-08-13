@@ -1,0 +1,13 @@
+apiVersion: v2
+name: kafkaesque
+description: Kafka management and observability platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - kafka
+  - observability
+  - schema-registry
+home: https://github.com/mrdrobotE/Kafkaesque
+maintainers:
+  - name: Kafkaesque

@@ -1,0 +1,120 @@
+# Enterprise demo overlay: Schema Registry, Kafka Connect, Kafka ACL authorizer.
+# Usage (from this directory):
+#   docker compose -f docker-compose.yml -f docker-compose.enterprise.yml up -d
+#
+# Then point Kafkaesque cluster at:
+#   schema_registry_url: http://schema-registry:8081
+#   connect_url:           http://kafka-connect:8083
+
+services:
+  kafka:
+    environment:
+      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      KAFKA_SUPER_USERS: User:ANONYMOUS
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.6.1
+    hostname: schema-registry
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/subjects >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - kafkaesque-test
+
+  kafka-connect:
+    image: confluentinc/cp-kafka-connect:7.6.1
+    hostname: kafka-connect
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: kafkaesque-connect
+      CONNECT_CONFIG_STORAGE_TOPIC: _connect.configs
+      CONNECT_OFFSET_STORAGE_TOPIC: _connect.offsets
+      CONNECT_STATUS_STORAGE_TOPIC: _connect.status
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+    depends_on:
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8083/connector-plugins >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 60s
+    networks:
+      - kafkaesque-test
+
+  enterprise-init:
+    image: curlimages/curl:8.11.1
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+      kafka-connect:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "Registering sample Avro schema orders-value..."
+        curl -sf -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+          --data '{"schema":"{\"type\":\"record\",\"name\":\"Order\",\"namespace\":\"demo\",\"fields\":[{\"name\":\"sequence\",\"type\":\"int\"},{\"name\":\"type\",\"type\":\"string\"}]}"}' \
+          http://schema-registry:8081/subjects/orders-value/versions || true
+
+        echo "Creating demo Kafka Connect connector..."
+        for i in 1 2 3 4 5 6 7 8 9 10; do
+          if curl -sf -X POST -H "Content-Type: application/json" \
+            --data '{"name":"demo-heartbeat","config":{"connector.class":"org.apache.kafka.connect.mirror.MirrorHeartbeatConnector","tasks.max":"1","source.cluster.alias":"source","target.cluster.alias":"target","source.cluster.bootstrap.servers":"kafka:9092","target.cluster.bootstrap.servers":"kafka:9092","replication.factor":"1","emit.heartbeats.interval.seconds":"30"}}' \
+            http://kafka-connect:8083/connectors; then
+            echo "Connector created."
+            break
+          fi
+          echo "Connect not ready, retry $i/10..."
+          sleep 10
+        done
+
+        echo "Enterprise demo init complete."
+    networks:
+      - kafkaesque-test
+
+  # Sidecar to run kafka-acls from apache image (curl image lacks kafka tools)
+  enterprise-acl-init:
+    image: apache/kafka:3.8.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+      enterprise-init:
+        condition: service_completed_successfully
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        sleep 5
+        /opt/kafka/bin/kafka-acls.sh --bootstrap-server kafka:9092 \
+          --add --allow-principal User:demo-user --operation Read --operation Describe \
+          --topic orders || echo "ACL may already exist"
+        /opt/kafka/bin/kafka-acls.sh --bootstrap-server kafka:9092 --list || true
+        echo "ACL seed complete."
+    networks:
+      - kafkaesque-test

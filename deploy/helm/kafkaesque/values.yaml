@@ -1,0 +1,67 @@
+replicaCount: 2
+
+image:
+  backend:
+    repository: kafkaesque/backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  frontend:
+    repository: kafkaesque/frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: nginx
+  hosts:
+    - host: kafkaesque.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+postgresql:
+  enabled: true
+  auth:
+    username: kafkaesque
+    password: changeme
+    database: kafkaesque
+
+env:
+  APP_ENV: production
+  HTTP_PORT: "8090"
+  CORS_ORIGINS: "https://kafkaesque.example.com"
+  REDIS_ENABLED: "false"
+  OIDC_ENABLED: "false"
+  LOCAL_LOGIN_ENABLED: "true"
+
+secrets:
+  # Override in production — use external-secrets or sealed-secrets
+  jwtSecret: ""
+  encryptionKey: ""
+
+resources:
+  backend:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  frontend:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+probes:
+  liveness:
+    path: /health
+  readiness:
+    path: /health/ready
