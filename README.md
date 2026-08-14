@@ -4,7 +4,7 @@
 
 The browser **never** connects directly to Kafka. All cluster credentials are stored encrypted on the server and used only by the Go backend.
 
-**License:** [Apache License 2.0](LICENSE) · **GitHub:** [github.com/mrdrobotE/Kafkaesque](https://github.com/mrdrobotE/Kafkaesque)
+**License:** [Apache License 2.0](LICENSE) · **GitHub:** [github.com/mrdrobotE/Kafkaesque](https://github.com/danieldestaw/Kafkaesque)
 
 ---
 
