@@ -4,7 +4,7 @@
 
 The browser **never** connects directly to Kafka. All cluster credentials are stored encrypted on the server and used only by the Go backend.
 
-**License:** [Apache License 2.0](LICENSE) · **GitHub:** [github.com/mrdrobotE/Kafkaesque](https://github.com/danieldestaw/Kafkaesque)
+**License:** [Apache License 2.0](LICENSE) · **GitHub:** [github.com/danieldestaw/Kafkaesque](https://github.com/danieldestaw/Kafkaesque)
 
 ---
 
@@ -187,6 +187,42 @@ The override file attaches the Kafkaesque backend to `kafkaesque-test` so it can
 4. Click **Test connection**, then save
 
 **Local backend dev** (Go running on the host, not in Docker): use bootstrap `localhost:9092` instead.
+
+### 3.1 Enterprise integrations (Schema Registry & Kafka Connect)
+
+If you're using the enterprise overlay with Schema Registry and Kafka Connect, use the **exact container names** from the test environment:
+
+| Service | URL to use |
+|---------|------------|
+| Schema Registry | `http://kafka-test-schema-registry-1:8081` |
+| Kafka Connect | `http://kafka-test-kafka-connect-1:8083` |
+
+> **Why these hostnames?** When running with `docker-compose.enterprise.yml`, the test environment creates containers with the `kafka-test-` prefix. Use these full container names to avoid DNS resolution errors.
+>
+> **Check your container names:**
+> ```bash
+> docker ps --format "table {{.Names}}\t{{.Status}}" | grep -E "connect|schema|kafka"
+> ```
+>
+> **Troubleshooting DNS issues:**
+> If you get `lookup connect on 127.0.0.11:53: server misbehaving`, the backend cannot resolve the service hostnames. To fix:
+>
+> ```bash
+> # Connect backend to the test network
+> docker network connect kafkaesque-test kafkaesque-backend-1
+>
+> # Restart backend
+> docker compose restart backend
+>
+> # Use the full container names shown above in the cluster configuration
+> ```
+>
+> **Verify connectivity from the backend:**
+> ```bash
+> docker compose exec backend ping -c 2 kafka-test-kafka-connect-1
+> docker compose exec backend ping -c 2 kafka-test-schema-registry-1
+> docker compose exec backend curl -s http://kafka-test-kafka-connect-1:8083 | head -10
+> ```
 
 ### 4. Explore in Kafkaesque
 
