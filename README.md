@@ -81,8 +81,13 @@ Kafkaesque/
 ├── docker-compose.prod.yml      # Production overlay (secrets, no public DB/API ports)
 ├── docker-compose.prod.tls.yml  # Optional TLS at nginx
 ├── docker-compose.test-kafka.yml
+├── Dockerfile                   # Single image (UI + API)
+├── docker-compose.single.yml
+├── docker-compose.single.hub.yml
+├── docker-compose.hub.yml       # Split images from Docker Hub
 ├── .env.production.example
 ├── scripts/generate-secrets.sh
+├── scripts/publish-dockerhub.sh
 ├── LICENSE
 └── ROADMAP.md
 ```
@@ -587,7 +592,69 @@ curl -X POST http://localhost:8090/api/v1/auth/login \
 
 See **[docs/production.md](docs/production.md)** for the full production guide (secrets, TLS, external Postgres, monitoring).
 
-### Production (Docker Compose)
+### Docker Hub (pre-built images)
+
+#### Single image (recommended) — UI + API in one container
+
+| Image | Description |
+|-------|-------------|
+| `kafkaesqueapp/kafkaesque` | nginx (UI) + Go API on port `80` |
+
+PostgreSQL still runs as a separate container (database is not bundled in the app image).
+
+**Try it:**
+
+```bash
+git clone https://github.com/danieldestaw/Kafkaesque.git
+cd Kafkaesque
+docker compose -f docker-compose.single.yml up -d --build
+```
+
+Open **http://localhost:3100** — login `admin` / `admin`.
+
+**From Docker Hub (no build):**
+
+```bash
+docker compose -f docker-compose.single.hub.yml up -d
+```
+
+#### Split images (optional) — backend + frontend separately
+
+| Image | Description |
+|-------|-------------|
+| `kafkaesqueapp/kafkaesque-backend` | Go API (`8090`) |
+| `kafkaesqueapp/kafkaesque-frontend` | React UI + nginx (`80` → host `3100`) |
+
+```bash
+docker compose -f docker-compose.hub.yml up -d
+```
+
+Pin a release tag:
+
+```bash
+KAFKAESQUE_IMAGE_TAG=1.0.0 docker compose -f docker-compose.single.hub.yml up -d
+```
+
+#### Publish to Docker Hub (maintainers)
+
+1. Create a repository on [Docker Hub](https://hub.docker.com): **`kafkaesque`** (single image)
+2. Log in: `docker login`
+3. Build and push:
+
+```bash
+export DOCKERHUB_USER=kafkaesqueapp
+export VERSION=1.0.0
+chmod +x scripts/publish-dockerhub.sh
+./scripts/publish-dockerhub.sh single
+```
+
+For separate backend/frontend images: `./scripts/publish-dockerhub.sh split`
+
+Multi-platform (amd64 + arm64): `MULTIARCH=1 ./scripts/publish-dockerhub.sh single`
+
+Do **not** bake secrets into images — set `JWT_SECRET`, `ENCRYPTION_KEY`, and passwords via environment / `.env` at runtime.
+
+### Production (Docker Compose — build from source)
 
 ```bash
 cp .env.production.example .env

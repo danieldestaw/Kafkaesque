@@ -1,0 +1,61 @@
+# All-in-one Kafkaesque image (UI + API) + PostgreSQL.
+#
+# Quick start:
+#   docker compose -f docker-compose.single.yml up -d --build
+#   open http://localhost:3100  (admin / admin)
+#
+# From Docker Hub (after publish):
+#   docker compose -f docker-compose.single.yml -f docker-compose.single.hub.yml up -d
+#
+# Production secrets:
+#   cp .env.production.example .env && ./scripts/generate-secrets.sh
+#   docker compose -f docker-compose.single.yml --env-file .env up -d --build
+
+services:
+  kafkaesque-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kafkaesque
+      POSTGRES_USER: kafkaesque
+      POSTGRES_PASSWORD: kafkaesque
+    ports:
+      - "5433:5432"
+    volumes:
+      - kafkaesque_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kafkaesque -d kafkaesque"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - kafkaesque-net
+
+  kafkaesque:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKERHUB_USER:-kafkaesqueapp}/kafkaesque:${KAFKAESQUE_IMAGE_TAG:-latest}
+    ports:
+      - "${KAFKAESQUE_HTTP_PORT:-3100}:80"
+    environment:
+      APP_ENV: development
+      HTTP_PORT: "8090"
+      DATABASE_URL: postgres://kafkaesque:kafkaesque@kafkaesque-db:5432/kafkaesque?sslmode=disable
+      JWT_SECRET: dev-kafkaesque-secret-change-in-prod
+      ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef"
+      CORS_ORIGINS: http://localhost:3100
+      DEFAULT_ADMIN_USER: admin
+      DEFAULT_ADMIN_PASS: admin
+    depends_on:
+      kafkaesque-db:
+        condition: service_healthy
+    networks:
+      - kafkaesque-net
+    restart: unless-stopped
+
+networks:
+  kafkaesque-net:
+    driver: bridge
+
+volumes:
+  kafkaesque_postgres:
